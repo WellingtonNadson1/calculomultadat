@@ -1,3 +1,5 @@
+from reportlab.pdfgen import canvas
+
 # Valor Base Bombeiro Militar
 vbbm = 27.61
 
@@ -12,6 +14,7 @@ infra_leve = []
 infra_media = []
 infra_grave = []
 infra_gravissima = []
+
 
 # Seleção do Risco Contra Incêndio da Edificação a ser Multada
 print('''
@@ -60,10 +63,29 @@ infra_grave2 = infra_grave.append(int(input('\nQuantas infrações graves foram 
 infra_gravissima2 = infra_gravissima.append(int(input('\nQuantas infrações gravíssimas foram cometidas? ')))
 
 if infra_leve[0] <= 4 and infra_media[0] <= 4 and infra_grave[0] <= 4 and infra_gravissima[0] <= 2:
-    multa = (2.5 * infra_leve[0] + 3.5 * infra_media[0] + 5 * infra_grave[0] + 7 * infra_gravissima[0]) * risco * area * vbbm
+    multa = round((2.5 * infra_leve[0] + 3.5 * infra_media[0] + 5 * infra_grave[0] + 7 * infra_gravissima[0]) * risco * area * vbbm, 2)
+    multa_formatada = str(multa).replace('.', ',')
     print(f'\nA edificação fica Multada segundo a Lei 11.390/2020 no valor de R$ {multa}\n')
 else:
     print('''
 Você deve atentar para a quantidade máxima permitida à cada nível 
 de infação a ser incluida no cálculo da Multa segundo a Lei 11.390.
 ''')
+    
+
+def GeneratePDF(multa):
+    try:
+        nome_pdf = 'Multa por Infração'
+        pdf = canvas.Canvas('{}.pdf'.format(nome_pdf))
+        pdf.setTitle(nome_pdf)
+        pdf.setFont("Helvetica-Oblique", 14)
+        pdf.drawString(245,750, 'A edificação por infringir a Lei 11.390, fica Multada:')
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(245,724, 'Valor da Multa')
+        pdf.drawString(247,704, 'R$ {}'.format(multa))
+        pdf.save()
+        print('{}.pdf criado com sucesso!'.format(nome_pdf))
+    except:
+        print('Erro ao gerar {}.pdf'.format(nome_pdf))
+multa = multa_formatada
+GeneratePDF(multa)
